@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1426">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="form-action 'none'">
-<meta name="app-version" content="2026.11.18.02">
+<meta name="app-version" content="2026.11.19.02">
 <script>
 // Kendini güncelleme: kayıtlı (indirilmiş) sürüm bu dosyadakinden yeniyse onu çalıştırır; açılmazsa 9 sn sonra eski sürüme döner.
 (function(){
@@ -32,6 +32,34 @@
 })();
 </script>
 <title>CANLI TV PRO · Halil Kılıç</title>
+<script type="application/json" id="release-notes">{
+ "2026.11.19.02": [
+  "Sanatçı düğmesi kaldırıldı (araçta çalışmadığı için), program önceki haline döndü. Diğer her şey olduğu gibi duruyor."
+ ],
+ "2026.11.18.03": [
+  "Yenilikler listesi: güncellemede nelerin değiştiği madde madde gösterilir (güncelleme penceresinde ve yüklemeden sonra açılışta).",
+  "Ekran koruyucu: galeride tüm resimleri tek hamlede silip yalnızca siyah ekran bırakabilirsiniz (🗑 düğmesi, yanlışlıkla silmemek için iki dokunuşla onay).",
+  "Hazır resimler (SH harfleri, çizim portre) de ✕ ile silinebilir, ↺ düğmesiyle geri getirilir. Yeni resim eklemeye devam edebilirsiniz."
+ ],
+ "2026.11.18.02": [
+  "Güncelleme adresi programda hazır geliyor, ⬇ penceresini açınca yeni sürüm kendiliğinden aranır.",
+  "“Açılışta kontrol et” ve “Otomatik uygula” kutuları işaretlenince hemen çalışır (müzik çalıyorsa kesmez).",
+  "İndirme ilerlemesi çubukla gösterilir. Yeni sürüm hazırsa ⬇ düğmesinin üstünde kırmızı nokta çıkar."
+ ],
+ "2026.11.18.01": [
+  "Düşük bellekli araç ekranları için hafif mod: logolar kapalı, daha az iş, ekran koruyucuda sürekli kayma animasyonu kapalı.",
+  "⬇ penceresine logo ve araç medya düğmesi ayarları eklendi.",
+  "Tanı raporu son dokunuşları ve yayın başlangıçlarını da kaydediyor."
+ ],
+ "2026.11.17.01": [
+  "Radyo: sorunsuz yayınlar listenin başında, eski tip yayınlar ⚠ ile işaretli, sertifikası bozuk yayınlar listelenmiyor.",
+  "Açılamayan yayın satırda ⚠ ile işaretleniyor. Sayfa yenilense de son çalan kanal ▶ ile devam ediyor.",
+  "Ekran klavyesinde x harfi düzeltildi. Güncelleme adresi şemasız yazımları (github.com/…) da kabul ediyor."
+ ],
+ "2026.11.16.01": [
+  "Kendini güncelleme sistemi: yeni sürümü adresten indirir, bozuk sürüm açılmazsa kendiliğinden eskisine döner."
+ ]
+}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <style>
 :root{--bg:#070a12;--p:#111827;--p2:#1b2638;--ln:#35445d;--tx:#f8fbff;--mu:#aab7c9;--a:#ffb020;--c:#36e4ff;--g:#43f09b;--r:#ff586e;--ink:#080b10}
@@ -162,6 +190,13 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
 .fv-bar .btn:disabled{opacity:.35}
 .ico{position:relative}
 .ico.has-upd::after{content:'';position:absolute;top:4px;right:4px;width:13px;height:13px;border-radius:50%;background:var(--r);border:2px solid var(--bg)}
+#news{z-index:27}
+.notes{margin:10px 0;padding:10px 12px;background:var(--p2);border:1px solid var(--ln);border-radius:12px;font-size:14px;line-height:1.45;color:var(--tx)}
+.notes[hidden]{display:none}
+.notes .nt{font-weight:900;color:var(--a);margin-bottom:6px}
+.notes b{color:var(--c)}
+.notes ul{margin:4px 0 10px;padding-left:20px}
+.notes li{margin:3px 0}
 .updstrip{position:fixed;left:0;right:0;bottom:0;z-index:19;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--p);border-top:2px solid var(--a)}
 .updstrip[hidden],#updProg[hidden]{display:none}
 .ptxt{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--tx)}
@@ -308,6 +343,13 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <button type="button" class="btn gray" id="m3uClose">Kapat</button>
  </div>
 </div>
+<div class="modal" id="news">
+ <div class="box">
+  <h2 id="newsTitle">🆕 Yenilikler</h2>
+  <div class="notes" id="newsBody"></div>
+  <button type="button" class="btn" id="newsOk">Tamam</button>
+ </div>
+</div>
 <div class="modal" id="updSet">
  <div class="box">
   <h2>⬇ Güncelleme ve ayarlar</h2>
@@ -321,10 +363,12 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <label class="tg"><input type="checkbox" id="o_logos"> Liste ve kapakta radyo/TV logolarını göster (düşük bellekli ekranda kapalı kalması önerilir)</label>
   <label class="tg"><input type="checkbox" id="o_ms"> Araç / direksiyon medya düğmeleri ve medya bilgisi (değişiklik yeniden açılışta geçerli olur)</label>
   <div class="note" id="updMsg"></div>
+  <div class="notes" id="updNotes" hidden></div>
   <div id="updProg" hidden><div class="ptxt" id="updPtxt"></div><div class="pbar" id="updPbar"><i id="updFill"></i></div></div>
   <button type="button" class="btn" id="updSave">Kaydet</button>
   <button type="button" class="btn gray" id="updCheck">🔍 Şimdi kontrol et</button>
   <button type="button" class="btn" id="updGo" disabled>⬇ Yeni sürümü yükle</button>
+  <button type="button" class="btn gray" id="updNewsBtn">🆕 Son sürümlerdeki yenilikler</button>
   <button type="button" class="btn gray" id="updRemove">↺ İndirilen güncellemeyi kaldır (yerleşik sürüme dön)</button>
   <button type="button" class="btn gray" id="updClose">Kapat</button>
  </div>
@@ -365,6 +409,9 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <div class="rg"><span>Tarih</span><input type="range" data-p="k.date" min="40" max="200" step="5"><b data-v="k.date"></b></div>
   <div class="sh2">GÖLGE RESİM</div>
   <div class="gal" id="gal"></div>
+  <div class="note">"Yok" seçiliyse ekran koruyucuda yalnızca siyah ekran (ve saat) görünür. Her resmin köşesindeki ✕ ile tek tek silebilirsiniz.</div>
+  <button type="button" class="btn gray" id="svDelAll">🗑 Tüm resimleri sil (yalnızca siyah ekran kalsın)</button>
+  <button type="button" class="btn gray" id="svRestore">↺ Hazır resimleri geri getir (SH harfleri, çizim portre)</button>
   <div class="rg"><span>Koyuluk</span><input type="range" data-p="g.op" min="5" max="90" step="5"><b data-v="g.op"></b></div>
   <div class="rg"><span>Bulanıklık</span><input type="range" data-p="g.blur" min="0" max="24" step="1"><b data-v="g.blur"></b></div>
   <div class="rg"><span>Boyut</span><input type="range" data-p="g.size" min="40" max="220" step="5"><b data-v="g.size"></b></div>
@@ -866,9 +913,9 @@ const SV_DEF = {enabled:true, openFav:false, delay:20, bg:'#000000', time:'#86c7
   show:{logo:true, name:true, time:true, date:true, hint:true, ghost:true, secs:false},
   k:{logo:100, time:100, name:100, date:100}, g:{img:'sh', op:30, blur:5, size:100, drift:!LITE}};
 const deepMerge = (d, s) => { const r = {}; for (const k in d) r[k] = d[k] && typeof d[k] === 'object' ? deepMerge(d[k], s && typeof s[k] === 'object' ? s[k] : {}) : (s && typeof s[k] === typeof d[k] ? s[k] : d[k]); return r; };
-let SVC = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_saver') || '{}') || {}; } catch(e){} const c = deepMerge(SV_DEF, o); c.imgs = Array.isArray(o.imgs) ? o.imgs.filter(x => x && x.id && x.n) : []; return c; })();
+let SVC = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_saver') || '{}') || {}; } catch(e){} const c = deepMerge(SV_DEF, o); c.imgs = Array.isArray(o.imgs) ? o.imgs.filter(x => x && x.id && x.n) : []; c.hidden = Array.isArray(o.hidden) ? o.hidden.filter(x => SV_BUILTIN.some(b => b.id === x)) : []; if (c.hidden.includes(c.g.img)) c.g.img = ''; return c; })();
 const saveSv = () => LS.set('halil_tv_saver', JSON.stringify(SVC));
-const svAll = () => SV_BUILTIN.concat(SVC.imgs);
+const svAll = () => SV_BUILTIN.filter(b => !SVC.hidden.includes(b.id)).concat(SVC.imgs);
 function svSrc(id){ if (GHOSTS[id]) return GHOSTS[id]; const m = SVC.imgs.find(x => x.id === id); return m ? (m.u || LS.get('halil_tv_svimg_' + id) || '') : ''; }
 function applySaver(){
   const sv = $('#saver'), c = SVC, set = (k, v) => sv.style.setProperty(k, v);
@@ -928,7 +975,7 @@ function svSync(){
 function renderGal(){
   const cur = SVC.g.img;
   $('#gal').innerHTML = '<div class="gw"><button type="button" class="gi' + (!cur ? ' on' : '') + '" data-gi=""><span>Yok</span></button></div>' + svAll().map(m =>
-    '<div class="gw"><button type="button" class="gi' + (cur === m.id ? ' on' : '') + '" data-gi="' + esc(m.id) + '"><span>' + esc(m.n) + '</span></button>' + (GHOSTS[m.id] ? '' : '<button type="button" class="gx" data-gx="' + esc(m.id) + '" aria-label="Sil">✕</button>') + '</div>').join('');
+    '<div class="gw"><button type="button" class="gi' + (cur === m.id ? ' on' : '') + '" data-gi="' + esc(m.id) + '"><span>' + esc(m.n) + '</span></button>' + '<button type="button" class="gx" data-gx="' + esc(m.id) + '" aria-label="Sil">✕</button>' + '</div>').join('');
   $('#gal').querySelectorAll('.gi[data-gi]').forEach(b => { const src = b.dataset.gi ? svSrc(b.dataset.gi) : ''; if (src) b.style.backgroundImage = 'url("' + src.replace(/"/g, '%22') + '")'; });
 }
 function buildSv(){
@@ -945,16 +992,29 @@ svSet.addEventListener('click', e => {
   if (t.dataset.col) { setP(t.dataset.col, t.dataset.val); svChanged(); }
   else if (t.dataset.gi !== undefined) { SVC.g.img = t.dataset.gi; if (t.dataset.gi) SVC.show.ghost = true; svChanged(); renderGal(); }
   else if (t.dataset.gx) {
-    const id = t.dataset.gx, i = SVC.imgs.findIndex(x => x.id === id); if (i < 0) return;
-    SVC.imgs.splice(i, 1); try { localStorage.removeItem('halil_tv_svimg_' + id); } catch(e){}
-    if (SVC.g.img === id) SVC.g.img = 'sh'; svChanged(); renderGal(); svMsg('Resim silindi.');
+    const id = t.dataset.gx, i = SVC.imgs.findIndex(x => x.id === id);
+    if (i >= 0) { SVC.imgs.splice(i, 1); try { localStorage.removeItem('halil_tv_svimg_' + id); } catch(e){} }
+    else if (GHOSTS[id] && !SVC.hidden.includes(id)) SVC.hidden.push(id);            // hazır resim: gizle (geri getirilebilir)
+    else return;
+    if (SVC.g.img === id) SVC.g.img = (svAll()[0] || {}).id || '';
+    svChanged(); renderGal(); svMsg(svAll().length ? 'Resim silindi.' : 'Resim silindi: hiç resim kalmadı, ekran koruyucu yalnızca siyah.');
   }
 });
 $('#svBtn').onclick = () => { buildSv(); svSet.classList.add('show'); };
 $('#svClose').onclick = () => { kbClose(); svSet.classList.remove('show'); kbT = search; };
 svSet.addEventListener('click', e => { if (e.target === svSet) { kbClose(); svSet.classList.remove('show'); kbT = search; } });
 $('#svPrev').onclick = () => { kbClose(); svSet.classList.remove('show'); svShow(true); };
-$('#svReset').onclick = () => { const imgs = SVC.imgs; SVC = deepMerge(SV_DEF, {}); SVC.imgs = imgs; saveSv(); applySaver(); buildSv(); svMsg('Varsayılan ayarlara dönüldü (eklediğiniz resimler durur).'); };
+$('#svReset').onclick = () => { const imgs = SVC.imgs, hid = SVC.hidden; SVC = deepMerge(SV_DEF, {}); SVC.imgs = imgs; SVC.hidden = hid; if (hid.includes(SVC.g.img)) SVC.g.img = ''; saveSv(); applySaver(); buildSv(); svMsg('Varsayılan ayarlara dönüldü (resimleriniz olduğu gibi durur).'); };
+const DELALL_TXT = '🗑 Tüm resimleri sil (yalnızca siyah ekran kalsın)'; let delAllT = 0;
+$('#svDelAll').onclick = () => {                                                      // yanlışlıkla silmesin: iki dokunuş
+  const b = $('#svDelAll');
+  if (!delAllT) { b.textContent = '⚠ Emin misiniz? Silmek için tekrar dokunun'; delAllT = setTimeout(() => { delAllT = 0; b.textContent = DELALL_TXT; }, 4000); return; }
+  clearTimeout(delAllT); delAllT = 0; b.textContent = DELALL_TXT;
+  SVC.imgs.forEach(m => { try { localStorage.removeItem('halil_tv_svimg_' + m.id); } catch(e){} });
+  SVC.imgs = []; SVC.hidden = SV_BUILTIN.map(x => x.id); SVC.g.img = '';
+  svChanged(); renderGal(); svMsg('🗑 Tüm resimler silindi: ekran koruyucu yalnızca siyah. Yeni resim eklemeye devam edebilirsiniz.');
+};
+$('#svRestore').onclick = () => { SVC.hidden = []; svChanged(); renderGal(); svMsg('Hazır resimler geri getirildi (SH harfleri, çizim portre).'); };
 $('#svKb').onclick = () => { if (kbOn) kbClose(); else { kbT = $('#svUrl'); kbOpen(); } };
 
 /* ---- Resim ekleme: kâğıt zeminini şeffaflaştırma / kenar yumuşatma ---- */
@@ -1052,6 +1112,13 @@ const APP_VERSION = (document.querySelector('meta[name=app-version]') || {}).con
 const DEFAULT_UPD_URL = 'https://halilmerinos-sudo.github.io/g-ncelleme-dosyas-fm/';
 let UPD = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_upd') || '{}') || {}; } catch(e){} return {url:o.url || DEFAULT_UPD_URL, check:o.check !== false, apply:!!o.apply, last:+o.last || 0}; })();
 const saveUpd = () => LS.set('halil_tv_upd', JSON.stringify(UPD));
+function parseNotes(txt){ try { const m = String(txt).match(/<script type="application\/json" id="release-notes">([\s\S]*?)<\/script>/); return m ? (JSON.parse(m[1]) || {}) : {}; } catch(e) { return {}; } }
+const LOCAL_NOTES = (() => { try { return JSON.parse((document.getElementById('release-notes') || {}).textContent || '{}') || {}; } catch(e) { return {}; } })();
+const notesBetween = (notes, from, to) => Object.keys(notes || {}).filter(v => v > from && v <= to).sort().reverse().map(v => ({v, items:(Array.isArray(notes[v]) ? notes[v] : []).filter(t => typeof t === 'string')})).filter(x => x.items.length);
+const notesLatest = (notes, n) => Object.keys(notes || {}).sort().reverse().slice(0, n).map(v => ({v, items:(Array.isArray(notes[v]) ? notes[v] : []).filter(t => typeof t === 'string')})).filter(x => x.items.length);
+const notesHTML = list => list.map(x => '<div><b>Sürüm ' + esc(x.v) + '</b><ul>' + x.items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>').join('');
+function showNews(list, title){ $('#newsTitle').textContent = title; $('#newsBody').innerHTML = list.length ? notesHTML(list) : '<div>Bu sürüm için not yok.</div>'; $('#news').classList.add('show'); }
+function renderUpdNotes(){ const el = $('#updNotes'), list = (pendUpd && pendUpd.news) || []; el.hidden = !list.length; if (list.length) el.innerHTML = '<div class="nt">🆕 Bu güncellemedeki yenilikler</div>' + notesHTML(list); }
 let pendUpd = null, updBusy = false, stripT = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const updMsg = t => { $('#updMsg').textContent = t; };
@@ -1088,7 +1155,7 @@ async function fetchRemote(onProg){
       const v = (txt.match(/<meta name="app-version" content="([^"]+)"/) || [])[1];
       if (!v || !/window\.__ready = true/.test(txt) || !/<\/html>\s*$/i.test(txt)) { const e = new Error('Bu adres geçerli bir Canlı TV Pro dosyası değil'); e.bad = true; throw e; }
       LS.set('halil_tv_upd_size', String(got));
-      return {ver:v, html:txt};
+      return {ver:v, html:txt, notes:parseNotes(txt)};
     } catch(e) { lastErr = e; if (e.bad || e.status) break; if (k === 0) await sleep(800); }
     finally { clearTimeout(t); }
   }
@@ -1103,7 +1170,7 @@ async function checkUpdate(manual, noApply){
     const r = await fetchRemote((got, est) => { const p = Math.min(99, Math.round(got / est * 100)); setProg(p, '⬇ İndiriliyor… %' + p + ' (' + Math.round(got / 1024) + ' KB)', true); });
     UPD.last = Date.now(); saveUpd();
     if (r.ver > APP_VERSION) {
-      pendUpd = r; markUpd(true); $('#updGo').disabled = false; logEv('güncelleme', 'yeni sürüm ' + r.ver);
+      pendUpd = r; pendUpd.news = notesBetween(r.notes, APP_VERSION, r.ver); renderUpdNotes(); markUpd(true); $('#updGo').disabled = false; logEv('güncelleme', 'yeni sürüm ' + r.ver);
       updMsg('⬇ Yeni sürüm indirildi: ' + r.ver + ' (şu an: ' + APP_VERSION + ').');
       if (UPD.apply && !noApply) {
         if (video.paused) { setProg(100, '✅ ' + r.ver + ' indirildi, yükleniyor…', true); setTimeout(() => applyUpdate(false), 800); return r; }
@@ -1111,7 +1178,7 @@ async function checkUpdate(manual, noApply){
       }
       setProg(100, '✅ Yeni sürüm indirildi: ' + r.ver); return r;
     }
-    pendUpd = null; markUpd(false); $('#updGo').disabled = true; $('#updbar').hidden = true;
+    pendUpd = null; renderUpdNotes(); markUpd(false); $('#updGo').disabled = true; $('#updbar').hidden = true;
     if (manual) { updMsg('✅ Güncel. Sürüm: ' + APP_VERSION + (r.ver < APP_VERSION ? ' (adresteki dosya daha eski: ' + r.ver + ')' : '')); setProg(100, '✅ Güncel (sürüm ' + APP_VERSION + ')'); } else hideProg();
     return null;
   } catch(e) {
@@ -1133,7 +1200,7 @@ const updSet = $('#updSet');
 $('#updBtn').onclick = () => {
   $('#updUrl').value = UPD.url; $('#o_logos').checked = OPT.logos; $('#o_ms').checked = OPT.ms; $('#u_check').checked = UPD.check; $('#u_apply').checked = UPD.apply;
   $('#updInfo').textContent = 'Sürüm: ' + APP_VERSION + ' · kaynak: ' + srcLabel() + (UPD.last ? ' · son kontrol: ' + new Date(UPD.last).toLocaleString('tr-TR') : '');
-  updMsg(pendUpd ? '⬇ Yeni sürüm hazır: ' + pendUpd.ver : ''); $('#updGo').disabled = !pendUpd; updSet.classList.add('show'); kbT = $('#updUrl');
+  updMsg(pendUpd ? '⬇ Yeni sürüm hazır: ' + pendUpd.ver : ''); renderUpdNotes(); $('#updGo').disabled = !pendUpd; updSet.classList.add('show'); kbT = $('#updUrl');
   if (UPD.url && !pendUpd && Date.now() - UPD.last > 30000) checkUpdate(true, true);       // pencereyi açınca kendiliğinden kontrol (uygulamadan)
 };
 const updClose = () => { kbClose(); updSet.classList.remove('show'); kbT = search; };
@@ -1149,6 +1216,9 @@ $('#u_apply').onchange = () => {                                                
   if (pendUpd) { if (video.paused) { updMsg('Yükleniyor…'); applyUpdate(true); } else updMsg('Müzik çalıyor: durdurunca "Yeni sürümü yükle"ye basın.'); }
   else checkUpdate(true);
 };
+$('#newsOk').onclick = () => $('#news').classList.remove('show');
+$('#news').addEventListener('click', e => { if (e.target.id === 'news') $('#news').classList.remove('show'); });
+$('#updNewsBtn').onclick = () => showNews(notesLatest(LOCAL_NOTES, 3), '🆕 Son sürümlerdeki yenilikler');
 $('#updSave').onclick = () => { updRead(); updMsg('✅ Kaydedildi.'); };
 $('#updCheck').onclick = async () => { updRead(); await checkUpdate(true); };
 $('#updGo').onclick = () => applyUpdate(true);
@@ -1243,6 +1313,14 @@ window.__ready = true;
 try { localStorage.removeItem('halil_tv_booting'); const rl = JSON.parse(sessionStorage.getItem('halil_tv_runs') || '[]'); rl.push(APP_VERSION); sessionStorage.setItem('halil_tv_runs', JSON.stringify(rl.slice(-8))); } catch(e){}
 try { const rv = localStorage.getItem('halil_tv_reverted'); if (rv) { localStorage.removeItem('halil_tv_reverted'); LS.set('halil_tv_bad', rv); setTimeout(() => toast('⚠ Güncelleme (' + rv + ') açılamadı, önceki sürüme dönüldü.', 7000), 1200); logEv('güncelleme-geri', rv); } } catch(e){}
 if (LS.get('halil_tv_bad') === APP_VERSION) LS.set('halil_tv_bad', '');
+try {   // sürüm değiştiyse (güncelleme ya da yeniden kurulum) yenilikleri bir kez göster
+  const last = LS.get('halil_tv_lastver') || '', fromUpd = /^güncelleme/.test(srcLabel());
+  let list = [];
+  if (last && last < APP_VERSION) list = notesBetween(LOCAL_NOTES, last, APP_VERSION);
+  else if (!last && fromUpd) list = notesLatest(LOCAL_NOTES, 3);            // ilk kez: sürüm kaydı yoksa son birkaç sürümü göster
+  if (last !== APP_VERSION) LS.set('halil_tv_lastver', APP_VERSION);
+  if (list.length) setTimeout(() => { if (!document.querySelector('.modal.show')) showNews(list, '🆕 Güncellendi: sürüm ' + APP_VERSION); }, 1500);
+} catch(e){}
 updAuto();
 </script>
 </body>
