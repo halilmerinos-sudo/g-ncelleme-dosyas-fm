@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1426">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="form-action 'none'">
-<meta name="app-version" content="2026.11.19.02">
+<meta name="app-version" content="2026.11.21.01">
 <script>
 // Kendini güncelleme: kayıtlı (indirilmiş) sürüm bu dosyadakinden yeniyse onu çalıştırır; açılmazsa 9 sn sonra eski sürüme döner.
 (function(){
@@ -31,35 +31,7 @@
   } catch (e) {}
 })();
 </script>
-<title>CANLI TV PRO · Halil Kılıç</title>
-<script type="application/json" id="release-notes">{
- "2026.11.19.02": [
-  "Sanatçı düğmesi kaldırıldı (araçta çalışmadığı için), program önceki haline döndü. Diğer her şey olduğu gibi duruyor."
- ],
- "2026.11.18.03": [
-  "Yenilikler listesi: güncellemede nelerin değiştiği madde madde gösterilir (güncelleme penceresinde ve yüklemeden sonra açılışta).",
-  "Ekran koruyucu: galeride tüm resimleri tek hamlede silip yalnızca siyah ekran bırakabilirsiniz (🗑 düğmesi, yanlışlıkla silmemek için iki dokunuşla onay).",
-  "Hazır resimler (SH harfleri, çizim portre) de ✕ ile silinebilir, ↺ düğmesiyle geri getirilir. Yeni resim eklemeye devam edebilirsiniz."
- ],
- "2026.11.18.02": [
-  "Güncelleme adresi programda hazır geliyor, ⬇ penceresini açınca yeni sürüm kendiliğinden aranır.",
-  "“Açılışta kontrol et” ve “Otomatik uygula” kutuları işaretlenince hemen çalışır (müzik çalıyorsa kesmez).",
-  "İndirme ilerlemesi çubukla gösterilir. Yeni sürüm hazırsa ⬇ düğmesinin üstünde kırmızı nokta çıkar."
- ],
- "2026.11.18.01": [
-  "Düşük bellekli araç ekranları için hafif mod: logolar kapalı, daha az iş, ekran koruyucuda sürekli kayma animasyonu kapalı.",
-  "⬇ penceresine logo ve araç medya düğmesi ayarları eklendi.",
-  "Tanı raporu son dokunuşları ve yayın başlangıçlarını da kaydediyor."
- ],
- "2026.11.17.01": [
-  "Radyo: sorunsuz yayınlar listenin başında, eski tip yayınlar ⚠ ile işaretli, sertifikası bozuk yayınlar listelenmiyor.",
-  "Açılamayan yayın satırda ⚠ ile işaretleniyor. Sayfa yenilense de son çalan kanal ▶ ile devam ediyor.",
-  "Ekran klavyesinde x harfi düzeltildi. Güncelleme adresi şemasız yazımları (github.com/…) da kabul ediyor."
- ],
- "2026.11.16.01": [
-  "Kendini güncelleme sistemi: yeni sürümü adresten indirir, bozuk sürüm açılmazsa kendiliğinden eskisine döner."
- ]
-}</script>
+<title>HALİL MEDIA PRO · TV, Radyo ve Müzik</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <style>
 :root{--bg:#070a12;--p:#111827;--p2:#1b2638;--ln:#35445d;--tx:#f8fbff;--mu:#aab7c9;--a:#ffb020;--c:#36e4ff;--g:#43f09b;--r:#ff586e;--ink:#080b10}
@@ -90,6 +62,7 @@ button:active{opacity:.7}
 .player>*,.foot{flex-shrink:0}
 .tv{position:relative;width:100%;aspect-ratio:16/9;max-height:42vh;max-height:42dvh;margin:0 auto;background:#000;border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:grid;place-items:center}
 .tv video{width:100%;height:100%;object-fit:contain}
+.tv .yt-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;z-index:1}
 .live{position:absolute;top:8px;left:8px;z-index:3;padding:4px 9px;border-radius:7px;background:var(--r);color:#fff;font-size:12px;font-weight:900}
 .cover{position:absolute;inset:0;z-index:2;display:none;place-items:center;font-size:clamp(50px,12vw,120px);background:radial-gradient(circle at 50% 40%,var(--p2),#05070d)}
 .cover.show{display:grid}
@@ -127,6 +100,7 @@ button:active{opacity:.7}
 .sq.go{border-color:var(--a);background:var(--a);color:var(--ink)}
 .chips{display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap}
 .chip.fav{border-color:var(--a);color:var(--a)}
+.chip#mMusic{border-color:#a77ad7;color:#d7a7ff}
 .chip{flex:1;min-height:48px;padding:4px 16px;border:2px solid var(--ln);background:var(--p);border-radius:99px;font-weight:900;white-space:nowrap}
 .chip.on{background:var(--a);border-color:var(--a);color:var(--ink)}
 .status{font-size:14px;color:var(--mu);min-height:18px;flex-shrink:0}
@@ -190,13 +164,6 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
 .fv-bar .btn:disabled{opacity:.35}
 .ico{position:relative}
 .ico.has-upd::after{content:'';position:absolute;top:4px;right:4px;width:13px;height:13px;border-radius:50%;background:var(--r);border:2px solid var(--bg)}
-#news{z-index:27}
-.notes{margin:10px 0;padding:10px 12px;background:var(--p2);border:1px solid var(--ln);border-radius:12px;font-size:14px;line-height:1.45;color:var(--tx)}
-.notes[hidden]{display:none}
-.notes .nt{font-weight:900;color:var(--a);margin-bottom:6px}
-.notes b{color:var(--c)}
-.notes ul{margin:4px 0 10px;padding-left:20px}
-.notes li{margin:3px 0}
 .updstrip{position:fixed;left:0;right:0;bottom:0;z-index:19;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--p);border-top:2px solid var(--a)}
 .updstrip[hidden],#updProg[hidden]{display:none}
 .ptxt{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--tx)}
@@ -258,6 +225,16 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
  .chip{min-height:min(42px,6.5vh);font-size:14px}
 }
 @media (orientation:landscape) and (max-height:620px){.eyebrow,.date span,.sub{display:none}}
+
+/* SC9863A / 2 GB RAM / Android 10 WebView için hafif görünüm */
+.lite-device { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+.lite-device *, .lite-device *::before, .lite-device *::after { scroll-behavior:auto !important; }
+.lite-device .sv-in, .lite-device .svdrift { animation:none !important; }
+.lite-device .row, .lite-device button, .lite-device .box { transition:none !important; }
+.lite-device .tv { max-height:36vh; max-height:36dvh; }
+.lite-device img { image-rendering:auto; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+
 </style>
 </head>
 <body>
@@ -267,7 +244,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
 <div class="banner" id="banner">⚠ İnternet bağlantısı yok</div>
 <div id="app">
  <header class="top">
-  <h1 class="brand">CANLI TV <b>PRO</b></h1>
+  <h1 class="brand">HALİL MEDIA <b>PRO</b></h1>
   <div class="net" id="net">ÇEVRİMİÇİ</div>
   <div class="date"><b id="clock">00:00</b><span id="date"></span></div>
   <div class="actions">
@@ -309,7 +286,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
  <section class="library">
   <div class="tools">
    <div class="sw">
-    <input class="search" id="search" type="text" form="no-form" inputmode="search" enterkeyhint="search" placeholder="Kanal / radyo adı, ya da sinema, haber, spor…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <input class="search" id="search" type="text" form="no-form" inputmode="search" enterkeyhint="search" placeholder="Kanal, radyo veya sanatçı / şarkı adı…" autocomplete="off" autocapitalize="off" spellcheck="false">
     <button type="button" class="clear" id="clear" aria-label="Temizle">✕</button>
    </div>
    <button type="button" class="sq" id="kbBtn" title="Klavye" aria-label="Klavye">⌨</button>
@@ -319,6 +296,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
    <button type="button" class="chip fav" id="favBtn">⭐ Favoriler</button>
    <button type="button" class="chip on" id="mTv">📺 TV</button>
    <button type="button" class="chip" id="mRadio">📻 Radyo</button>
+    <button type="button" class="chip" id="mMusic">🎵 Müzik</button>
    <button type="button" class="chip" id="mList">📋 Listem</button>
    <button type="button" class="chip" id="listBtn" style="flex:0 0 56px;padding:0" title="M3U listesi ekle" aria-label="M3U listesi ekle">➕</button>
   </div>
@@ -343,13 +321,6 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <button type="button" class="btn gray" id="m3uClose">Kapat</button>
  </div>
 </div>
-<div class="modal" id="news">
- <div class="box">
-  <h2 id="newsTitle">🆕 Yenilikler</h2>
-  <div class="notes" id="newsBody"></div>
-  <button type="button" class="btn" id="newsOk">Tamam</button>
- </div>
-</div>
 <div class="modal" id="updSet">
  <div class="box">
   <h2>⬇ Güncelleme ve ayarlar</h2>
@@ -363,12 +334,10 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <label class="tg"><input type="checkbox" id="o_logos"> Liste ve kapakta radyo/TV logolarını göster (düşük bellekli ekranda kapalı kalması önerilir)</label>
   <label class="tg"><input type="checkbox" id="o_ms"> Araç / direksiyon medya düğmeleri ve medya bilgisi (değişiklik yeniden açılışta geçerli olur)</label>
   <div class="note" id="updMsg"></div>
-  <div class="notes" id="updNotes" hidden></div>
   <div id="updProg" hidden><div class="ptxt" id="updPtxt"></div><div class="pbar" id="updPbar"><i id="updFill"></i></div></div>
   <button type="button" class="btn" id="updSave">Kaydet</button>
   <button type="button" class="btn gray" id="updCheck">🔍 Şimdi kontrol et</button>
   <button type="button" class="btn" id="updGo" disabled>⬇ Yeni sürümü yükle</button>
-  <button type="button" class="btn gray" id="updNewsBtn">🆕 Son sürümlerdeki yenilikler</button>
   <button type="button" class="btn gray" id="updRemove">↺ İndirilen güncellemeyi kaldır (yerleşik sürüme dön)</button>
   <button type="button" class="btn gray" id="updClose">Kapat</button>
  </div>
@@ -465,7 +434,9 @@ const video = $('#video'), tv = $('#tv'), search = $('#search');
 /* ---- Tanı kaydı: hatalar, ağ ve oynatma olayları (bir sonraki açılışta da okunabilir) ---- */
 // Düşük bellekli araç ekranı (örn. 2 GB, Android WebView): uzak logoları yükleme, ağır işleri azalt
 const LITE = !!((navigator.deviceMemory && navigator.deviceMemory <= 2) || /Dalvik/i.test(navigator.userAgent));
-const OPT = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem('halil_tv_opts') || '{}') || {}; } catch(e){} return {logos: typeof o.logos === 'boolean' ? o.logos : !LITE, ms: typeof o.ms === 'boolean' ? o.ms : true}; })();
+// Araç ünitesi profili: 2 GB RAM / 32 bit Android WebView / düşük güçlü GPU.
+document.documentElement.classList.toggle('lite-device', LITE);
+const OPT = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem('halil_tv_opts') || '{}') || {}; } catch(e){} return {logos: typeof o.logos === 'boolean' ? o.logos : !LITE, ms: typeof o.ms === 'boolean' ? o.ms : !LITE}; })();
 const saveOpt = () => { try { localStorage.setItem('halil_tv_opts', JSON.stringify(OPT)); } catch(e){} };
 const T_OPEN = Date.now(), LOGS = [];
 const PREVLOG = (() => { try { return JSON.parse(localStorage.getItem('halil_tv_log') || '[]'); } catch(e) { return []; } })();
@@ -503,7 +474,7 @@ document.addEventListener('touchmove', e => {
 /* ---- Araç tarayıcısının "çekince yenile"si sayfa en üstteyken (kaydırma konumu 0) devreye girer: sayfayı hep 1 px aşağıda tut ---- */
 const anchorScroll = () => { if ((window.scrollY || document.documentElement.scrollTop || 0) < 1) window.scrollTo(0, 1); };
 window.addEventListener('scroll', anchorScroll, {passive:true}); window.addEventListener('resize', anchorScroll); window.addEventListener('load', anchorScroll);
-anchorScroll(); setInterval(anchorScroll, 1500);
+anchorScroll(); setInterval(() => { if (!document.hidden) anchorScroll(); }, LITE ? 5000 : 1500);
 /* ---- Hata olursa ekranda göster (sayfa kendiliğinden yenilenmez) ---- */
 function showErr(m){ logEv('hata', m); $('#errtxt').textContent = '⚠ ' + String(m).slice(0, 220); $('#errbar').hidden = false; }
 window.addEventListener('error', e => { const m = e && e.message; if (!m || /^Script error/i.test(m) || /ResizeObserver/i.test(m)) return; showErr('Hata: ' + m + (e.lineno ? ' (satır ' + e.lineno + ')' : '')); });
@@ -517,11 +488,11 @@ document.addEventListener('submit', e => { e.preventDefault(); e.stopPropagation
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button'); if (b && b.type === 'submit') e.preventDefault(); }, true);
 ['keydown', 'keypress'].forEach(n => document.addEventListener(n, e => { if (e.key === 'Enter' && e.target && e.target.tagName === 'INPUT') e.preventDefault(); }, true));
 
-const TYPE = {tv:{ico:'📺', l:'TV', c:'#36e4ff'}, radio:{ico:'📻', l:'RADYO', c:'#43f09b'}};
-let FAVS = []; try { const a = JSON.parse(LS.get('halil_tv_favs_v3') || LS.get('halil_tv_favs_v2') || '[]'); if (Array.isArray(a)) FAVS = a.filter(f => f && (f.type === 'tv' || f.type === 'radio') && Array.isArray(f.src) && f.src.length); } catch(e){}
+const TYPE = {music:{ico:'🎵', l:'MÜZİK', c:'#d7a7ff'}, tv:{ico:'📺', l:'TV', c:'#36e4ff'}, radio:{ico:'📻', l:'RADYO', c:'#43f09b'}};
+let FAVS = []; try { const a = JSON.parse(LS.get('halil_tv_favs_v3') || LS.get('halil_tv_favs_v2') || '[]'); if (Array.isArray(a)) FAVS = a.filter(f => f && (f.type === 'tv' || f.type === 'radio' || f.type === 'music') && ((Array.isArray(f.src) && f.src.length) || (f.type === 'music' && f.videoId))); } catch(e){}
 const saveFavs = () => LS.set('halil_tv_favs_v3', JSON.stringify(FAVS));
 const deadIds = new Set();
-let hls = null, current = null, srcIdx = 0, token = 0, queue = [], qIdx = 0, res = [], sections = [];
+let hls = null, current = null, srcIdx = 0, token = 0, queue = [], qIdx = 0, res = [], sections = [], ytFrame = null;
 let mode = 'tv', sTok = 0, online = navigator.onLine !== false;
 let trList = null, myList = null; const catCache = {};
 
@@ -542,11 +513,12 @@ async function getText(url, ms, tries){
     throw e;
   } finally { clearTimeout(t); }
 }
-const getJSON = async (url, ms) => JSON.parse(await getText(url, ms));
+const getJSON = async (url, ms, tries) => JSON.parse(await getText(url, ms, tries));
 
 /* ---- Saat, bağlantı ---- */
 const tick = () => { const n = new Date(); $('#clock').textContent = n.toTimeString().slice(0, 5); $('#date').textContent = n.toLocaleDateString('tr-TR'); };
-tick(); setInterval(tick, 1000);
+tick(); setInterval(tick, LITE ? 15000 : 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 function setOnline(v){
   if (v === online) return; online = v; logEv('bağlantı', v ? 'çevrimiçi' : 'çevrimdışı');
   $('#net').classList.toggle('off', !v); $('#net').textContent = v ? 'ÇEVRİMİÇİ' : 'ÇEVRİMDIŞI'; $('#banner').classList.toggle('show', !v);
@@ -557,6 +529,8 @@ window.addEventListener('online', () => setOnline(true)); window.addEventListene
 /* ---- Oynatma ---- */
 function destroy(){
   token++;
+  if (ytFrame) { try { ytFrame.src = 'about:blank'; ytFrame.remove(); } catch(e){} ytFrame = null; }
+  video.style.display = '';
   if (hls) { try { hls.destroy(); } catch(e){} hls = null; }
   try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){}
   loading(false);
@@ -565,7 +539,7 @@ function showNow(){
   const it = current, T = TYPE[it.type];
   $('#name').textContent = it.name; $('#sub').textContent = it.sub || T.l; $('#eyebrow').textContent = 'ŞİMDİ OYNATILIYOR';
   const cv = $('#cover');
-  if (it.type === 'radio') {
+  if (it.type === 'radio' || it.type === 'music') {
     cv.innerHTML = it.img && OPT.logos ? '<img alt="" referrerpolicy="no-referrer" src="' + esc(it.img) + '">' : T.ico;
     const im = cv.querySelector('img'); if (im) im.onerror = () => { cv.textContent = T.ico; };
     cv.classList.add('show');
@@ -578,14 +552,29 @@ function showNow(){
 let skipDir = 0, skipLeft = 0;
 function playItem(it, list, i, keep){ if (!keep) skipDir = 0; if (list) { queue = list; qIdx = i; } current = it; try { LS.set('halil_tv_last', JSON.stringify(it)); } catch(e){} logEv('oynat', it.name + ' @ ' + hostOf(it.src && it.src[0] || '')); srcIdx = 0; showNow(); loadStream(); }
 function loadStream(){
-  const it = current; if (!it || !it.src || !it.src.length) return;
+  const it = current; if (!it) return;
+  if (it.type === 'music' && it.videoId) {
+    destroy(); const frame = document.createElement('iframe'); ytFrame = frame; frame.className = 'yt-frame';
+    frame.title = it.name + ' - YouTube'; frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; frame.allowFullscreen = true;
+    const origin = /^https?:$/.test(location.protocol) ? '&origin=' + encodeURIComponent(location.origin) : '';
+    frame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(it.videoId) + '?autoplay=1&playsinline=1&rel=0&enablejsapi=1' + origin;
+    tv.insertBefore(frame, tv.querySelector('.spin')); $('#cover').classList.remove('show'); video.style.display = 'none';
+    $('#live').textContent = 'YOUTUBE'; loading(false); setPlaying(true);
+    frame.addEventListener('load', () => { if (ytFrame === frame) $('#live').textContent = 'OYNATMA HAZIR'; });
+    return;
+  }
+  video.style.display = ''; if (!it.src || !it.src.length) return;
   destroy(); const my = token;
   if (!online) { setPlaying(false); $('#live').textContent = 'BAĞLANTI YOK'; return toast('⚠ İnternet bağlantısı yok'); }
   const url = it.src[srcIdx], fail = () => { if (my === token) { logEv('yayın-hata', it.name + ' @ ' + hostOf(url) + ' ' + memNow() + (video.error ? ' kod ' + video.error.code + (video.error.message ? ' ' + String(video.error.message).slice(0, 50) : '') : '')); tryNext(); } };
   loading(true); $('#live').textContent = 'BAĞLANIYOR';
   setTimeout(() => { if (my === token && video.paused && !video.currentTime) tryNext(); }, 20000);
   if (/\.m3u8(\?|$)/i.test(url) && window.Hls && Hls.isSupported()) {
-    hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+    hls = new Hls(LITE ? {
+      // Küçük RAM'de tamponu sınırla; eski videoyu bellekte biriktirme.
+      maxBufferLength: 18, maxMaxBufferLength: 28, maxBufferSize: 24 * 1000 * 1000,
+      backBufferLength: 10, lowLatencyMode: false, capLevelToPlayerSize: true
+    } : {}); hls.loadSource(url); hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => { if (my === token) video.play().catch(() => {}); });
     let rec = false;
     hls.on(Hls.Events.ERROR, (e, d) => {
@@ -746,25 +735,57 @@ async function sRadio(q, partial){
   if (!out.length && !all && got.every(x => x.status === 'rejected')) throw got[0].reason;
   return byScore().slice(0, lim);
 }
+
+/* ---- Müzik arama: Apple katalog önizlemeleri (genellikle 30 sn) ----
+   Tam şarkı yayını değil; telifli parçalar için katalog önizlemesi sunulur.
+   Tam sürüm için sonuçtaki dış bağlantıdan Apple Music / YouTube Music açılabilir. */
+const MUSIC_INSTANCES = [
+  'https://inv.nadeko.net',
+  'https://invidious.nerdvpn.de',
+  'https://yt.chocolatemoo53.com',
+  'https://invidious.tiekoetter.com'
+];
+async function sMusic(q){
+  if (!q) { const e = new Error('musicquery'); throw e; }
+  const term = /official|resmi|lyrics|sözleri/i.test(q) ? q : q + ' official audio';
+  let lastErr = null, data = null, used = '';
+  for (const base of MUSIC_INSTANCES) {
+    try {
+      data = await getJSON(base + '/api/v1/search?q=' + encodeURIComponent(term) + '&type=video&page=1&hl=tr', 9000, 0);
+      if (Array.isArray(data) && data.length) { used = base; break; }
+    } catch(e) { lastErr = e; logEv('müzik-kaynak', base + ' ' + errDetail(e)); }
+  }
+  if (!data || !Array.isArray(data)) { const e = new Error('Tam parça arama kaynaklarına ulaşılamadı. İnterneti kontrol edip tekrar deneyin.'); e.cause = lastErr; throw e; }
+  const out = [];
+  data.filter(v => v && v.type === 'video' && v.videoId && (Number(v.lengthSeconds) || 0) >= 90).slice(0, 35).forEach((v, i) => {
+    const thumb = Array.isArray(v.videoThumbnails) ? (v.videoThumbnails.find(x => x.quality === 'high') || v.videoThumbnails[v.videoThumbnails.length - 1] || {}).url : '';
+    const secs = Number(v.lengthSeconds) || 0, dur = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    out.push({id:'ytmusic_' + v.videoId, type:'music', name:String(v.title || 'Bilinmeyen parça'), sub:String(v.author || 'YouTube') + ' · ' + dur + ' · Tam video', img:thumb || '', ab:'♫', src:[], videoId:v.videoId, url:'https://www.youtube.com/watch?v=' + encodeURIComponent(v.videoId), provider:used});
+  });
+  return out;
+}
+
 async function runSearch(){
   const q = search.value.trim(), my = ++sTok;
   if (!online) { $('#status').textContent = '⚠ İnternet bağlantısı yok'; return; }
   $('#status').textContent = 'Aranıyor...'; res = []; render();
-  try { res = mode === 'list' ? await sList(q) : mode === 'tv' ? await sTV(q, part => { if (my === sTok) { res = part; render(); $('#status').textContent = part.length + ' sonuç, kategori taranıyor…'; } }) : await sRadio(q, part => { if (my === sTok) { res = part; render(); $('#status').textContent = part.length + ' sonuç, ek sonuçlar aranıyor…'; } }); }
+  try { res = mode === 'list' ? await sList(q) : mode === 'tv' ? await sTV(q, part => { if (my === sTok) { res = part; render(); $('#status').textContent = part.length + ' sonuç, kategori taranıyor…'; } }) : mode === 'radio' ? await sRadio(q, part => { if (my === sTok) { res = part; render(); $('#status').textContent = part.length + ' sonuç, ek sonuçlar aranıyor…'; } }) : await sMusic(q); }
   catch(e) { if (my !== sTok) return; logEv('arama-hata', mode + ' ' + errDetail(e)); res = []; render();
     if (e && e.empty) { $('#status').textContent = 'Henüz liste eklenmedi. ➕ düğmesinden M3U adresi girin.'; return; }
+    if (e && e.message === 'musicquery') { $('#status').textContent = 'Sanatçı veya şarkı adı yazıp 🔍 düğmesine basın.'; return; }
     if (e && e.none) { $('#status').textContent = 'Listede kanal bulunamadı. M3U biçimini (#EXTINF satırları) kontrol edin.'; return; }
     $('#status').innerHTML = 'Kaynak şu an yanıt vermiyor (' + esc(errDetail(e)) + '). <button type="button" class="retry" id="retry">↻ Tekrar dene</button>'; return; }
   if (my !== sTok) return;
-  logEv('arama', mode + ' "' + q.slice(0, 24) + '" → ' + res.length + ' sonuç ' + memNow()); render(); $('#status').textContent = res.length ? (res.total > res.length ? 'İlk ' + res.length + ' / ' + res.total + ' kanal gösteriliyor. Aramayla daraltın.' : res.length + ' sonuç') : 'Sonuç bulunamadı.';
+  logEv('arama', mode + ' "' + q.slice(0, 24) + '" → ' + res.length + ' sonuç ' + memNow()); render(); $('#status').textContent = res.length ? (mode === 'music' ? res.length + ' tam uzunlukta video bulundu · YouTube üzerinden oynatılır.' : (res.total > res.length ? 'İlk ' + res.length + ' / ' + res.total + ' kanal gösteriliyor. Aramayla daraltın.' : res.length + ' sonuç')) : (mode === 'music' ? 'Tam uzunlukta eşleşme bulunamadı. Sanatçı + şarkı adıyla tekrar deneyin.' : 'Sonuç bulunamadı.');
 }
 function setMode(m){
   mode = m; res = []; sTok++;
-  $('#mTv').classList.toggle('on', m === 'tv'); $('#mRadio').classList.toggle('on', m === 'radio'); $('#mList').classList.toggle('on', m === 'list');
-  $('#status').textContent = m === 'tv' ? 'Türkiye kanalları aranır. 🔍 ile arayın; "sinema", "haber", "spor" gibi kelimeler de yazabilirsiniz.' : m === 'radio' ? 'Türkiye FM / radyo istasyonları aranır. Boş bırakıp 🔍 ile popülerleri görün.' : 'Kendi M3U listenizde aranır. Boş bırakıp 🔍 ile tüm listeyi görün.';
+  $('#mTv').classList.toggle('on', m === 'tv'); $('#mRadio').classList.toggle('on', m === 'radio'); $('#mList').classList.toggle('on', m === 'list'); $('#mMusic').classList.toggle('on', m === 'music');
+  search.placeholder = m === 'music' ? 'Sanatçı veya şarkı adı yazın…' : 'Kanal, radyo veya sanatçı / şarkı adı…';
+  $('#status').textContent = m === 'tv' ? 'Türkiye kanalları aranır. 🔍 ile arayın; "sinema", "haber", "spor" gibi kelimeler de yazabilirsiniz.' : m === 'radio' ? 'Türkiye FM / radyo istasyonları aranır. Boş bırakıp 🔍 ile popülerleri görün.' : m === 'music' ? '🎵 Tam uzunlukta müzik videoları aranır. Şarkıyı seçerek YouTube oynatıcısında dinleyin.' : 'Kendi M3U listenizde aranır. Boş bırakıp 🔍 ile tüm listeyi görün.';
   render();
 }
-$('#mTv').onclick = () => setMode('tv'); $('#mRadio').onclick = () => setMode('radio'); $('#mList').onclick = () => setMode('list');
+$('#mTv').onclick = () => setMode('tv'); $('#mRadio').onclick = () => setMode('radio'); $('#mList').onclick = () => setMode('list'); $('#mMusic').onclick = () => setMode('music');
 $('#goBtn').onclick = runSearch;
 $('#status').addEventListener('click', e => { if (e.target.id === 'retry') runSearch(); });
 let rq = 0; search.addEventListener('input', () => { if (rq) return; rq = requestAnimationFrame(() => { rq = 0; render(); }); });      // yazarken yalnızca favoriler süzülür, internete gidilmez
@@ -785,14 +806,14 @@ function toggleFav(it){
 function moveFav(id, d){ const i = FAVS.findIndex(f => f.id === id), n = i + d; if (i < 0 || n < 0 || n >= FAVS.length) return; [FAVS[i], FAVS[n]] = [FAVS[n], FAVS[i]]; saveFavs(); render(); }
 function render(){
   const q = fold(search.value); sections = []; let h = '';
-  if (res.length) sections.push({t:mode === 'tv' ? '📺 TV SONUÇLARI' : mode === 'radio' ? '📻 RADYO SONUÇLARI' : '📋 LİSTEM', k:'res', items:res, c:'var(--c)'});
+  if (res.length) sections.push({t:mode === 'tv' ? '📺 TV SONUÇLARI' : mode === 'radio' ? '📻 RADYO SONUÇLARI' : mode === 'music' ? '🎵 MÜZİK SONUÇLARI' : '📋 LİSTEM', k:'res', items:res, c:'var(--c)'});
   sections.push({t:'⭐ FAVORİLERİM', k:'fav', items:q ? FAVS.filter(f => fold(f.name + ' ' + f.sub).includes(q)) : FAVS, c:'var(--a)'});
   sections.forEach((s, si) => {
     h += '<div class="sec" style="color:' + s.c + '">' + s.t + '</div>';
-    if (!s.items.length) { h += '<div class="empty">' + (s.k === 'fav' ? (FAVS.length ? 'Eşleşen favori yok.' : 'Henüz favori yok.<br>Arayıp bulduğunuza ☆ basın; kalıcı saklanır.') : '') + '</div>'; return; }
+    if (!s.items.length) { h += '<div class="empty">' + (s.k === 'fav' ? (FAVS.length ? 'Eşleşen favori yok.' : 'Henüz favori yok.<br>Arayıp bulduğunuza ☆ basın; kalıcı saklanır.') : (mode === 'music' ? 'Sanatçı veya şarkı adı yazıp arayın.' : '')) + '</div>'; return; }
     s.items.forEach((it, i) => {
       const fav = FAVS.some(f => f.id === it.id);
-      const btns = s.k === 'fav' ? '<button type="button" data-a="up">▲</button><button type="button" data-a="down">▼</button><button type="button" class="d" data-a="fav">✕</button>' : '<button type="button" class="' + (fav ? 'f' : '') + '" data-a="fav">' + (fav ? '★' : '☆') + '</button>';
+      const btns = s.k === 'fav' ? '<button type="button" data-a="up">▲</button><button type="button" data-a="down">▼</button><button type="button" class="d" data-a="fav">✕</button>' : (it.type === 'music' && it.url ? '<button type="button" title="YouTube’da aç" data-a="open">↗</button>' : '') + '<button type="button" class="' + (fav ? 'f' : '') + '" data-a="fav">' + (fav ? '★' : '☆') + '</button>';
       h += '<div class="row' + (current && current.id === it.id ? ' active' : '') + '" data-id="' + esc(it.id) + '" data-s="' + si + '" data-i="' + i + '"><div class="av" style="background:' + TYPE[it.type].c + '">' + (it.img && OPT.logos ? '<img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" data-ab="' + esc(it.ab || '') + '" src="' + esc(it.img) + '">' : esc(it.ab || TYPE[it.type].ico)) + '</div><div class="ri" data-a="play"><div class="rn">' + esc(it.name) + '</div><div class="rs">' + TYPE[it.type].ico + ' ' + (deadIds.has(it.id) ? '⚠ açılamadı · ' : '') + esc(it.sub || '') + '</div></div><div class="rb">' + btns + '</div></div>';
     });
   });
@@ -804,13 +825,14 @@ $('#list').addEventListener('click', e => {
   const row = e.target.closest('.row'); if (!row) return;
   const s = sections[+row.dataset.s], it = s && s.items[+row.dataset.i]; if (!it) return;
   const a = (e.target.closest('[data-a]') || {dataset:{}}).dataset.a;
-  if (a === 'fav') toggleFav(it); else if (a === 'up') moveFav(it.id, -1); else if (a === 'down') moveFav(it.id, 1); else if (a === 'play') playItem(it, s.items, +row.dataset.i);
+  if (a === 'open' && it.url) { window.open(it.url, '_blank', 'noopener'); } else if (a === 'fav') toggleFav(it); else if (a === 'up') moveFav(it.id, -1); else if (a === 'down') moveFav(it.id, 1); else if (a === 'play') playItem(it, s.items, +row.dataset.i);
 });
 
 /* ---- Kontroller ---- */
 $('#play').onclick = () => {
   if (!current) { if (FAVS.length) playItem(FAVS[0], FAVS, 0); else toast('Önce arama yapıp bir kanal seçin'); return; }
   if (!hls && !video.getAttribute('src')) return loadStream();
+  if (current.type === 'music' && ytFrame) { try { ytFrame.contentWindow.postMessage(JSON.stringify({event:'command',func:$('#play').classList.contains('on') ? 'pauseVideo' : 'playVideo',args:[]}), '*'); } catch(e){} const p = !$('#play').classList.contains('on'); setPlaying(p); $('#live').textContent = p ? 'YOUTUBE' : 'DURDU'; return; }
   if (video.paused) { video.play().catch(() => {}); setPlaying(true); } else { video.pause(); setPlaying(false); $('#live').textContent = 'DURDU'; }
 };
 $('#stop').onclick = () => { destroy(); setPlaying(false); $('#live').textContent = 'DURDU'; };
@@ -951,13 +973,14 @@ function svHide(){
 }
 $('#saver').addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); svHide(); });
 setInterval(() => {
+  if (document.hidden) return;
   const ok = radioPlaying();
   if (svOn) {
     if (!ok && !svPrev) return svHide();
     svDraw();
     if (++svTick % 30 === 0) $('#svIn').style.transform = 'translate(' + ((Math.random() * 2 - 1) * 3).toFixed(1) + 'vw,' + ((Math.random() * 2 - 1) * 3).toFixed(1) + 'vh)';   // ekranda iz kalmasın
   } else if (SVC.enabled && ok && Date.now() - lastAct >= SVC.delay * 1000 && !kbOn && !document.querySelector('.modal.show') && !full) svShow();
-}, 1000);
+}, LITE ? 2500 : 1000);
 
 /* ---- Ayar paneli ---- */
 const svSet = $('#svSet');
@@ -1112,13 +1135,6 @@ const APP_VERSION = (document.querySelector('meta[name=app-version]') || {}).con
 const DEFAULT_UPD_URL = 'https://halilmerinos-sudo.github.io/g-ncelleme-dosyas-fm/';
 let UPD = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_upd') || '{}') || {}; } catch(e){} return {url:o.url || DEFAULT_UPD_URL, check:o.check !== false, apply:!!o.apply, last:+o.last || 0}; })();
 const saveUpd = () => LS.set('halil_tv_upd', JSON.stringify(UPD));
-function parseNotes(txt){ try { const m = String(txt).match(/<script type="application\/json" id="release-notes">([\s\S]*?)<\/script>/); return m ? (JSON.parse(m[1]) || {}) : {}; } catch(e) { return {}; } }
-const LOCAL_NOTES = (() => { try { return JSON.parse((document.getElementById('release-notes') || {}).textContent || '{}') || {}; } catch(e) { return {}; } })();
-const notesBetween = (notes, from, to) => Object.keys(notes || {}).filter(v => v > from && v <= to).sort().reverse().map(v => ({v, items:(Array.isArray(notes[v]) ? notes[v] : []).filter(t => typeof t === 'string')})).filter(x => x.items.length);
-const notesLatest = (notes, n) => Object.keys(notes || {}).sort().reverse().slice(0, n).map(v => ({v, items:(Array.isArray(notes[v]) ? notes[v] : []).filter(t => typeof t === 'string')})).filter(x => x.items.length);
-const notesHTML = list => list.map(x => '<div><b>Sürüm ' + esc(x.v) + '</b><ul>' + x.items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>').join('');
-function showNews(list, title){ $('#newsTitle').textContent = title; $('#newsBody').innerHTML = list.length ? notesHTML(list) : '<div>Bu sürüm için not yok.</div>'; $('#news').classList.add('show'); }
-function renderUpdNotes(){ const el = $('#updNotes'), list = (pendUpd && pendUpd.news) || []; el.hidden = !list.length; if (list.length) el.innerHTML = '<div class="nt">🆕 Bu güncellemedeki yenilikler</div>' + notesHTML(list); }
 let pendUpd = null, updBusy = false, stripT = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const updMsg = t => { $('#updMsg').textContent = t; };
@@ -1155,7 +1171,7 @@ async function fetchRemote(onProg){
       const v = (txt.match(/<meta name="app-version" content="([^"]+)"/) || [])[1];
       if (!v || !/window\.__ready = true/.test(txt) || !/<\/html>\s*$/i.test(txt)) { const e = new Error('Bu adres geçerli bir Canlı TV Pro dosyası değil'); e.bad = true; throw e; }
       LS.set('halil_tv_upd_size', String(got));
-      return {ver:v, html:txt, notes:parseNotes(txt)};
+      return {ver:v, html:txt};
     } catch(e) { lastErr = e; if (e.bad || e.status) break; if (k === 0) await sleep(800); }
     finally { clearTimeout(t); }
   }
@@ -1170,7 +1186,7 @@ async function checkUpdate(manual, noApply){
     const r = await fetchRemote((got, est) => { const p = Math.min(99, Math.round(got / est * 100)); setProg(p, '⬇ İndiriliyor… %' + p + ' (' + Math.round(got / 1024) + ' KB)', true); });
     UPD.last = Date.now(); saveUpd();
     if (r.ver > APP_VERSION) {
-      pendUpd = r; pendUpd.news = notesBetween(r.notes, APP_VERSION, r.ver); renderUpdNotes(); markUpd(true); $('#updGo').disabled = false; logEv('güncelleme', 'yeni sürüm ' + r.ver);
+      pendUpd = r; markUpd(true); $('#updGo').disabled = false; logEv('güncelleme', 'yeni sürüm ' + r.ver);
       updMsg('⬇ Yeni sürüm indirildi: ' + r.ver + ' (şu an: ' + APP_VERSION + ').');
       if (UPD.apply && !noApply) {
         if (video.paused) { setProg(100, '✅ ' + r.ver + ' indirildi, yükleniyor…', true); setTimeout(() => applyUpdate(false), 800); return r; }
@@ -1178,7 +1194,7 @@ async function checkUpdate(manual, noApply){
       }
       setProg(100, '✅ Yeni sürüm indirildi: ' + r.ver); return r;
     }
-    pendUpd = null; renderUpdNotes(); markUpd(false); $('#updGo').disabled = true; $('#updbar').hidden = true;
+    pendUpd = null; markUpd(false); $('#updGo').disabled = true; $('#updbar').hidden = true;
     if (manual) { updMsg('✅ Güncel. Sürüm: ' + APP_VERSION + (r.ver < APP_VERSION ? ' (adresteki dosya daha eski: ' + r.ver + ')' : '')); setProg(100, '✅ Güncel (sürüm ' + APP_VERSION + ')'); } else hideProg();
     return null;
   } catch(e) {
@@ -1200,7 +1216,7 @@ const updSet = $('#updSet');
 $('#updBtn').onclick = () => {
   $('#updUrl').value = UPD.url; $('#o_logos').checked = OPT.logos; $('#o_ms').checked = OPT.ms; $('#u_check').checked = UPD.check; $('#u_apply').checked = UPD.apply;
   $('#updInfo').textContent = 'Sürüm: ' + APP_VERSION + ' · kaynak: ' + srcLabel() + (UPD.last ? ' · son kontrol: ' + new Date(UPD.last).toLocaleString('tr-TR') : '');
-  updMsg(pendUpd ? '⬇ Yeni sürüm hazır: ' + pendUpd.ver : ''); renderUpdNotes(); $('#updGo').disabled = !pendUpd; updSet.classList.add('show'); kbT = $('#updUrl');
+  updMsg(pendUpd ? '⬇ Yeni sürüm hazır: ' + pendUpd.ver : ''); $('#updGo').disabled = !pendUpd; updSet.classList.add('show'); kbT = $('#updUrl');
   if (UPD.url && !pendUpd && Date.now() - UPD.last > 30000) checkUpdate(true, true);       // pencereyi açınca kendiliğinden kontrol (uygulamadan)
 };
 const updClose = () => { kbClose(); updSet.classList.remove('show'); kbT = search; };
@@ -1216,9 +1232,6 @@ $('#u_apply').onchange = () => {                                                
   if (pendUpd) { if (video.paused) { updMsg('Yükleniyor…'); applyUpdate(true); } else updMsg('Müzik çalıyor: durdurunca "Yeni sürümü yükle"ye basın.'); }
   else checkUpdate(true);
 };
-$('#newsOk').onclick = () => $('#news').classList.remove('show');
-$('#news').addEventListener('click', e => { if (e.target.id === 'news') $('#news').classList.remove('show'); });
-$('#updNewsBtn').onclick = () => showNews(notesLatest(LOCAL_NOTES, 3), '🆕 Son sürümlerdeki yenilikler');
 $('#updSave').onclick = () => { updRead(); updMsg('✅ Kaydedildi.'); };
 $('#updCheck').onclick = async () => { updRead(); await checkUpdate(true); };
 $('#updGo').onclick = () => applyUpdate(true);
@@ -1313,14 +1326,6 @@ window.__ready = true;
 try { localStorage.removeItem('halil_tv_booting'); const rl = JSON.parse(sessionStorage.getItem('halil_tv_runs') || '[]'); rl.push(APP_VERSION); sessionStorage.setItem('halil_tv_runs', JSON.stringify(rl.slice(-8))); } catch(e){}
 try { const rv = localStorage.getItem('halil_tv_reverted'); if (rv) { localStorage.removeItem('halil_tv_reverted'); LS.set('halil_tv_bad', rv); setTimeout(() => toast('⚠ Güncelleme (' + rv + ') açılamadı, önceki sürüme dönüldü.', 7000), 1200); logEv('güncelleme-geri', rv); } } catch(e){}
 if (LS.get('halil_tv_bad') === APP_VERSION) LS.set('halil_tv_bad', '');
-try {   // sürüm değiştiyse (güncelleme ya da yeniden kurulum) yenilikleri bir kez göster
-  const last = LS.get('halil_tv_lastver') || '', fromUpd = /^güncelleme/.test(srcLabel());
-  let list = [];
-  if (last && last < APP_VERSION) list = notesBetween(LOCAL_NOTES, last, APP_VERSION);
-  else if (!last && fromUpd) list = notesLatest(LOCAL_NOTES, 3);            // ilk kez: sürüm kaydı yoksa son birkaç sürümü göster
-  if (last !== APP_VERSION) LS.set('halil_tv_lastver', APP_VERSION);
-  if (list.length) setTimeout(() => { if (!document.querySelector('.modal.show')) showNews(list, '🆕 Güncellendi: sürüm ' + APP_VERSION); }, 1500);
-} catch(e){}
 updAuto();
 </script>
 </body>
