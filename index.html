@@ -1133,7 +1133,7 @@ document.addEventListener('keydown', e => {
 /* ---- Güncelleme: adresten (GitHub vb.) kendini güncelleme ---- */
 const APP_VERSION = (document.querySelector('meta[name=app-version]') || {}).content || '?';
 const DEFAULT_UPD_URL = 'https://halilmerinos-sudo.github.io/g-ncelleme-dosyas-fm/';
-let UPD = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_upd') || '{}') || {}; } catch(e){} return {url:o.url || DEFAULT_UPD_URL, check:o.check !== false, apply:!!o.apply, last:+o.last || 0}; })();
+let UPD = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_upd') || '{}') || {}; } catch(e){} return {url:o.url || DEFAULT_UPD_URL, check:false, apply:false, last:+o.last || 0}; })();
 const saveUpd = () => LS.set('halil_tv_upd', JSON.stringify(UPD));
 let pendUpd = null, updBusy = false, stripT = 0;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -1217,7 +1217,7 @@ $('#updBtn').onclick = () => {
   $('#updUrl').value = UPD.url; $('#o_logos').checked = OPT.logos; $('#o_ms').checked = OPT.ms; $('#u_check').checked = UPD.check; $('#u_apply').checked = UPD.apply;
   $('#updInfo').textContent = 'Sürüm: ' + APP_VERSION + ' · kaynak: ' + srcLabel() + (UPD.last ? ' · son kontrol: ' + new Date(UPD.last).toLocaleString('tr-TR') : '');
   updMsg(pendUpd ? '⬇ Yeni sürüm hazır: ' + pendUpd.ver : ''); $('#updGo').disabled = !pendUpd; updSet.classList.add('show'); kbT = $('#updUrl');
-  if (UPD.url && !pendUpd && Date.now() - UPD.last > 30000) checkUpdate(true, true);       // pencereyi açınca kendiliğinden kontrol (uygulamadan)
+  // Otomatik ağ isteği kapalı; güncelleme yalnızca kullanıcı elle istediğinde kontrol edilir.
 };
 const updClose = () => { kbClose(); updSet.classList.remove('show'); kbT = search; };
 $('#updClose').onclick = updClose; updSet.addEventListener('click', e => { if (e.target === updSet) updClose(); });
@@ -1326,7 +1326,7 @@ window.__ready = true;
 try { localStorage.removeItem('halil_tv_booting'); const rl = JSON.parse(sessionStorage.getItem('halil_tv_runs') || '[]'); rl.push(APP_VERSION); sessionStorage.setItem('halil_tv_runs', JSON.stringify(rl.slice(-8))); } catch(e){}
 try { const rv = localStorage.getItem('halil_tv_reverted'); if (rv) { localStorage.removeItem('halil_tv_reverted'); LS.set('halil_tv_bad', rv); setTimeout(() => toast('⚠ Güncelleme (' + rv + ') açılamadı, önceki sürüme dönüldü.', 7000), 1200); logEv('güncelleme-geri', rv); } } catch(e){}
 if (LS.get('halil_tv_bad') === APP_VERSION) LS.set('halil_tv_bad', '');
-updAuto();
+// Otomatik güncelleme kapalı: uygulama arka planda kendini değiştirmez.
 </script>
 </body>
 </html>
