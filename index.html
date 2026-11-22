@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1426">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="form-action 'none'">
-<meta name="app-version" content="2026.11.21.01">
+<meta name="app-version" content="2026.11.22.01">
 <script>
 // Kendini güncelleme: kayıtlı (indirilmiş) sürüm bu dosyadakinden yeniyse onu çalıştırır; açılmazsa 9 sn sonra eski sürüme döner.
 (function(){
@@ -56,6 +56,10 @@ button:active{opacity:.7}
 .date{text-align:right;line-height:1.1}
 .date b{display:block;color:var(--c);font-size:clamp(20px,3.6vw,30px)}
 .date span{color:var(--a);font-size:12px;font-weight:800}
+/* Android TV / Google TV kumanda odağı */
+:where(button,a,input,select,textarea,[tabindex="0"],.row):focus-visible{outline:3px solid var(--a)!important;outline-offset:3px!important;box-shadow:0 0 0 5px color-mix(in srgb,var(--a) 28%,transparent)!important;}
+.row[tabindex="0"]{cursor:pointer}
+@media (hover:none){button:focus{outline:3px solid var(--a);outline-offset:3px}}
 .ico{width:52px;height:52px;padding:0;border:1px solid var(--ln);background:var(--p);border-radius:14px;font-size:22px}
 .actions{display:flex;gap:6px}
 .player{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
@@ -814,7 +818,7 @@ function render(){
     s.items.forEach((it, i) => {
       const fav = FAVS.some(f => f.id === it.id);
       const btns = s.k === 'fav' ? '<button type="button" data-a="up">▲</button><button type="button" data-a="down">▼</button><button type="button" class="d" data-a="fav">✕</button>' : (it.type === 'music' && it.url ? '<button type="button" title="YouTube’da aç" data-a="open">↗</button>' : '') + '<button type="button" class="' + (fav ? 'f' : '') + '" data-a="fav">' + (fav ? '★' : '☆') + '</button>';
-      h += '<div class="row' + (current && current.id === it.id ? ' active' : '') + '" data-id="' + esc(it.id) + '" data-s="' + si + '" data-i="' + i + '"><div class="av" style="background:' + TYPE[it.type].c + '">' + (it.img && OPT.logos ? '<img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" data-ab="' + esc(it.ab || '') + '" src="' + esc(it.img) + '">' : esc(it.ab || TYPE[it.type].ico)) + '</div><div class="ri" data-a="play"><div class="rn">' + esc(it.name) + '</div><div class="rs">' + TYPE[it.type].ico + ' ' + (deadIds.has(it.id) ? '⚠ açılamadı · ' : '') + esc(it.sub || '') + '</div></div><div class="rb">' + btns + '</div></div>';
+      h += '<div class="row' + (current && current.id === it.id ? ' active' : '') + '" tabindex="0" role="button" aria-label="' + esc(it.name) + '" data-id="' + esc(it.id) + '" data-s="' + si + '" data-i="' + i + '"><div class="av" style="background:' + TYPE[it.type].c + '">' + (it.img && OPT.logos ? '<img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="" data-ab="' + esc(it.ab || '') + '" src="' + esc(it.img) + '">' : esc(it.ab || TYPE[it.type].ico)) + '</div><div class="ri" data-a="play"><div class="rn">' + esc(it.name) + '</div><div class="rs">' + TYPE[it.type].ico + ' ' + (deadIds.has(it.id) ? '⚠ açılamadı · ' : '') + esc(it.sub || '') + '</div></div><div class="rb">' + btns + '</div></div>';
     });
   });
   if ($('#favs') && $('#favs').classList.contains('show')) fvRender();
@@ -1297,19 +1301,37 @@ if (OPT.ms && 'mediaSession' in navigator) {
   const ps = v => { try { navigator.mediaSession.playbackState = v; } catch(e){} };
   video.addEventListener('playing', () => ps('playing')); video.addEventListener('pause', () => ps('paused')); video.addEventListener('emptied', () => ps('none'));
 }
-const NEXT_K = ['ArrowRight', 'ArrowDown', 'PageDown', 'MediaTrackNext', 'ChannelUp'], PREV_K = ['ArrowLeft', 'ArrowUp', 'PageUp', 'MediaTrackPrevious', 'ChannelDown'];
-const KCODE = {176:'MediaTrackNext', 177:'MediaTrackPrevious', 178:'MediaStop', 179:'MediaPlayPause'};
+const KCODE = {176:'MediaTrackNext',177:'MediaTrackPrevious',178:'MediaStop',179:'MediaPlayPause'};
+const TV_FOCUS = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"],.row[role="button"]';
+function tvFocusable(){ return [...document.querySelectorAll(TV_FOCUS)].filter(el => { const r=el.getBoundingClientRect(), st=getComputedStyle(el); return r.width>0 && r.height>0 && st.visibility!=='hidden' && st.display!=='none' && !el.closest('[hidden],.hidden,.modal:not(.show),.set:not(.show),.panel:not(.show)'); }); }
+function tvMoveFocus(dir){
+  const all=tvFocusable(); if(!all.length) return;
+  const cur=document.activeElement, cr=cur&&cur.getBoundingClientRect();
+  if(!cr || !all.includes(cur)){ (all.find(x=>x.matches('.row')) || all[0]).focus(); return; }
+  const cx=cr.left+cr.width/2, cy=cr.top+cr.height/2;
+  const candidates=all.filter(el=>el!==cur).map(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-cx,dy=y-cy,primary=dir==='ArrowLeft'?-dx:dir==='ArrowRight'?dx:dir==='ArrowUp'?-dy:dy,secondary=(dir==='ArrowLeft'||dir==='ArrowRight')?Math.abs(dy):Math.abs(dx);return {el,primary,secondary,score:primary+secondary*2.2};}).filter(x=>x.primary>3).sort((a,b)=>a.score-b.score);
+  if(candidates.length){const n=candidates[0].el;n.focus({preventScroll:true});const r=n.getBoundingClientRect();if(r.top<8||r.bottom>innerHeight-8||r.left<8||r.right>innerWidth-8)n.scrollIntoView({block:'nearest',inline:'nearest'});}
+}
 document.addEventListener('keydown', e => {
-  const k = e.key && e.key !== 'Unidentified' ? e.key : (KCODE[e.keyCode] || ''), media = /^Media|^Channel/.test(k);
-  if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
-  if (k === 'MediaPlayPause') { e.preventDefault(); togglePlay(); return; }
-  if (k === 'MediaPlay') { e.preventDefault(); if (!current || video.paused) togglePlay(); return; }
-  if (k === 'MediaPause') { e.preventDefault(); if (current && !video.paused) togglePlay(); return; }
-  if (k === 'MediaStop') { e.preventDefault(); $('#stop').click(); return; }
-  const dir = NEXT_K.includes(k) ? 1 : PREV_K.includes(k) ? -1 : 0; if (!dir) return;
-  const t = e.target, typing = t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName);
-  if (!media && (typing || kbOn || document.querySelector('.modal.show'))) return;   // yazarken / pencere açıkken ok tuşları normal çalışsın
-  e.preventDefault(); navStep(dir);
+  const k=e.key&&e.key!=='Unidentified'?e.key:(KCODE[e.keyCode]||''), t=e.target, typing=t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName);
+  if(e.ctrlKey||e.altKey||e.metaKey)return;
+  if(k==='MediaPlayPause'||k==='MediaPlay'||k==='MediaPause'){e.preventDefault();if(k==='MediaPlayPause'||(k==='MediaPlay'&&(!current||video.paused))||(k==='MediaPause'&&current&&!video.paused))togglePlay();return;}
+  if(k==='MediaStop'){e.preventDefault();$('#stop').click();return;}
+  if(k==='MediaTrackNext'||k==='ChannelUp'){e.preventDefault();navStep(1);return;}
+  if(k==='MediaTrackPrevious'||k==='ChannelDown'){e.preventDefault();navStep(-1);return;}
+  if(k==='Escape'||k==='BrowserBack'||k==='GoBack'||e.keyCode===4||k==='Backspace'&& !typing){
+    if(kbOn){kbClose();e.preventDefault();return;}
+    const modal=document.querySelector('.modal.show');if(modal){const close=modal.querySelector('.close,.x,[data-close]');if(close)close.click();else modal.classList.remove('show');e.preventDefault();return;}
+    if(full){exitFull();e.preventDefault();return;}
+    if(document.activeElement&&document.activeElement!==document.body){document.activeElement.blur();e.preventDefault();}return;
+  }
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k)){
+    if(typing||kbOn)return;
+    e.preventDefault();tvMoveFocus(k);return;
+  }
+  if((k==='Enter'||k===' ')&&t&&t.classList&&t.classList.contains('row')){
+    e.preventDefault();const s=sections[+t.dataset.s],it=s&&s.items[+t.dataset.i];if(it)playItem(it,s.items,+t.dataset.i);
+  }
 });
 
 /* ---- Başlangıç ---- */
