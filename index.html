@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1426">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="form-action 'none'">
-<meta name="app-version" content="2026.11.27.02">
+<meta name="app-version" content="2026.11.27.03">
 <script>
 // Kendini güncelleme: kayıtlı (indirilmiş) sürüm bu dosyadakinden yeniyse onu çalıştırır; açılmazsa 9 sn sonra eski sürüme döner.
 (function(){
@@ -162,6 +162,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
 .saver.has-daily .sv-time{font-size:calc(min(13vh,18vw) * var(--k-time,1))}
 .saver.has-daily .sv-name{font-size:calc(min(3.5vh,5vw) * var(--k-name,1))}
 .saver.has-daily .sv-date{font-size:calc(min(3vh,4vw) * var(--k-date,1))}
+.saver.daily-done .sv-daily{display:none!important}
 .sv-daily{width:100%;max-width:1000px;display:flex;flex-direction:column;gap:12px;margin:6px 0}
 .sv-quote{padding:12px 16px;border:1px solid currentColor;border-radius:16px;background:rgba(0,0,0,.65);overflow-wrap:anywhere}
 .sv-ayah{color:var(--c-ayah,#82dcb5);font-size:calc(clamp(18px,3.1vw,24px) * var(--k-ayah,1))}
@@ -387,7 +388,9 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
    <label class="tg"><input type="checkbox" data-p="show.ghost"> Gölge resim</label>
    <label class="tg"><input type="checkbox" data-p="show.ayah"> Günün ayeti (Türkçe meal)</label>
    <label class="tg"><input type="checkbox" data-p="show.hadith"> Günün hadisi</label>
+   <label class="tg"><input type="checkbox" data-p="dailyOnce"> Ayet ve hadis günde yalnız 1 kez gösterilsin</label>
   </div>
+  <button type="button" class="btn gray" id="svDailyReset">↻ Ayet/hadisi bugün tekrar göster</button>
   <div class="sh2">VERİLERİN EKRANDAKİ YERİ</div>
   <div class="sv-pos" role="group" aria-label="Verilerin konumu">
    <button type="button" data-pos="top">▲ Üstte</button>
@@ -405,7 +408,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
   <div class="rg"><span>Tarih</span><input type="range" data-p="k.date" min="40" max="200" step="5"><b data-v="k.date"></b></div>
   <div class="rg"><span>Ayet yazı boyutu</span><input type="range" data-p="k.ayah" min="60" max="200" step="5"><b data-v="k.ayah"></b></div>
   <div class="rg"><span>Hadis yazı boyutu</span><input type="range" data-p="k.hadith" min="60" max="200" step="5"><b data-v="k.hadith"></b></div>
-  <div class="note">Ayet ve hadis, cihazın tarihine göre her gün değişir. İnternetsiz çalışan 14 ayet / ayet bölümü ve 14 hadis / hadis bölümü sırayla gösterilir; 14 günde tekrar eder. Türkçe anlam ve kaynak bilgisi gösterilir. Büyük yazılarda ekranı kaydırabilirsiniz.</div>
+  <div class="note">Ayet ve hadis, cihazın tarihine göre her gün değişir. "Günde yalnız 1 kez" açıkken ekran koruyucu bunları günün ilk açılışında gösterir; aynı gün sonraki açılışlarda görünmez, ertesi gün yeni ayet ve hadis ile tekrar çıkar. İnternetsiz çalışan 14 ayet / ayet bölümü ve 14 hadis / hadis bölümü sırayla gösterilir; 14 günde tekrar eder. Türkçe anlam ve kaynak bilgisi gösterilir. Büyük yazılarda ekranı kaydırabilirsiniz.</div>
   <div class="sh2">GÖLGE RESİM</div>
   <div class="gal" id="gal"></div>
   <div class="rg"><span>Koyuluk</span><input type="range" data-p="g.op" min="5" max="90" step="5"><b data-v="g.op"></b></div>
@@ -921,12 +924,18 @@ const GHOSTS = {sh:'data:image/webp;base64,UklGRmjWAABXRUJQVlA4WAoAAAAQAAAABwIA1
 const SV_BUILTIN = [{id:'sh', n:'SH harfleri'}, {id:'portre', n:'Çizim portre'}];
 const SV_DEF = {enabled:true, openFav:false, delay:20, position:'center', bg:'#000000', time:'#86c7ee', name:'#f0c27f', date:'#aab7c9', hint:'#6f7f9a', ayah:'#82dcb5', hadith:'#f0c27f',
   show:{logo:true, name:true, time:true, date:true, hint:true, ghost:true, secs:false, ayah:true, hadith:true},
-  k:{logo:100, time:100, name:100, date:100, ayah:100, hadith:100}, g:{img:'sh', op:30, blur:5, size:100, drift:!LITE}};
+  k:{logo:100, time:100, name:100, date:100, ayah:100, hadith:100}, g:{img:'sh', op:30, blur:5, size:100, drift:!LITE}, dailyOnce:true};
 const deepMerge = (d, s) => { const r = {}; for (const k in d) r[k] = d[k] && typeof d[k] === 'object' ? deepMerge(d[k], s && typeof s[k] === 'object' ? s[k] : {}) : (s && typeof s[k] === typeof d[k] ? s[k] : d[k]); return r; };
 let SVC = (() => { let o = {}; try { o = JSON.parse(LS.get('halil_tv_saver') || '{}') || {}; } catch(e){} const c = deepMerge(SV_DEF, o); c.imgs = Array.isArray(o.imgs) ? o.imgs.filter(x => x && x.id && x.n) : []; c.hiddenBuiltin = Array.isArray(o.hiddenBuiltin) ? o.hiddenBuiltin.filter(x => typeof x === 'string') : []; c.hiddenBg = Array.isArray(o.hiddenBg) ? o.hiddenBg.filter(x => /^#[0-9a-f]{6}$/i.test(x) && x.toLowerCase() !== '#000000').map(x => x.toLowerCase()) : []; c.bgColors = Array.isArray(o.bgColors) ? o.bgColors.filter(x => /^#[0-9a-f]{6}$/i.test(x)).map(x => x.toLowerCase()) : []; if (!['top','center','bottom'].includes(c.position)) c.position = 'center'; if (c.hiddenBg.includes(c.bg.toLowerCase())) c.bg = '#000000'; if (c.hiddenBuiltin.includes(c.g.img)) c.g.img = ''; return c; })();
 const saveSv = () => LS.set('halil_tv_saver', JSON.stringify(SVC));
 const svAll = () => SV_BUILTIN.filter(m => !SVC.hiddenBuiltin.includes(m.id)).concat(SVC.imgs);
 function svSrc(id){ if (GHOSTS[id]) return GHOSTS[id]; const m = SVC.imgs.find(x => x.id === id); return m ? (m.u || LS.get('halil_tv_svimg_' + id) || '') : ''; }
+const DAILY_KEY = 'halil_tv_daily_seen';
+function svDayKey(n){ n = n || new Date(); return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate(); }
+function dailyShownToday(){ try { return LS.get(DAILY_KEY) === svDayKey(); } catch(e) { return false; } }
+function markDailyShown(){ try { LS.set(DAILY_KEY, svDayKey()); } catch(e){} }
+function dailyHidden(){ return !!SVC.dailyOnce && (SVC.show.ayah || SVC.show.hadith) && dailyShownToday(); }
+function applyDailyOnce(){ const sv = $('#saver'); if (sv) sv.classList.toggle('daily-done', dailyHidden()); }
 function applySaver(){
   const sv = $('#saver'), c = SVC, set = (k, v) => sv.style.setProperty(k, v);
   sv.dataset.position = c.position;
@@ -939,6 +948,7 @@ function applySaver(){
   ['logo', 'name', 'time', 'date', 'hint', 'ghost', 'ayah', 'hadith'].forEach(k => sv.classList.toggle('no-' + k, !c.show[k]));
   sv.classList.toggle('no-drift', !c.g.drift);
   sv.classList.toggle('has-daily', c.show.ayah || c.show.hadith);
+  applyDailyOnce();
 }
 applySaver();
 
@@ -965,6 +975,7 @@ function svDrawDaily(n){
 
 function svDraw(){
   const n = new Date(), it = current || DEMO;
+  if (svPrev) $('#saver').classList.remove('daily-done'); else applyDailyOnce();
   svDrawDaily(n);
   $('#svTime').textContent = n.toTimeString().slice(0, SVC.show.secs ? 8 : 5);
   $('#svDate').textContent = n.toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric', weekday:'long'});
@@ -976,6 +987,7 @@ function svDraw(){
 function svShow(prev){ svPrev = !!prev; svId = ''; svOn = true; $('#saver').hidden = false; $('#svIn').scrollTop = 0; svDraw(); }
 function svHide(){
   svOn = false; $('#saver').hidden = true; lastAct = Date.now();
+  if (!svPrev && !dailyHidden()) markDailyShown();   // günün ilk gösterimi tamamlandı: bugün bir daha çıkmaz
   if (svPrev) { svPrev = false; $('#svSet').classList.add('show'); return; }               // önizlemeden ayarlara dön
   if (SVC.openFav && current && FAVS.some(f => f.id === current.id)) { openFavs(); return; }   // çalma (favori) listesine dön: çalan kanalın sayfası açılır
   const r = document.querySelector('.row.active'); if (r) { try { r.scrollIntoView({block:'center'}); } catch(e){} }
@@ -1051,6 +1063,7 @@ $('#svClose').onclick = () => { kbClose(); svSet.classList.remove('show'); kbT =
 svSet.addEventListener('click', e => { if (e.target === svSet) { kbClose(); svSet.classList.remove('show'); kbT = search; } });
 $('#svPrev').onclick = () => { kbClose(); svSet.classList.remove('show'); svShow(true); };
 $('#svReset').onclick = () => { const keep = {imgs:SVC.imgs, hiddenBuiltin:SVC.hiddenBuiltin, hiddenBg:SVC.hiddenBg, bgColors:SVC.bgColors}; SVC = Object.assign(deepMerge(SV_DEF, {}), keep); if (SVC.hiddenBuiltin.includes(SVC.g.img)) SVC.g.img = ''; saveSv(); applySaver(); buildSv(); svMsg('Varsayılan ayarlara dönüldü (eklenen resimler korunur, silinenler geri gelmez).'); };
+$('#svDailyReset').onclick = () => { try { localStorage.removeItem(DAILY_KEY); } catch(e){} applyDailyOnce(); svMsg('Ayet ve hadis bugün tekrar gösterilecek.'); };
 $('#svKb').onclick = () => { if (kbOn) kbClose(); else { kbT = $('#svUrl'); kbOpen(); } };
 
 /* ---- Resim ekleme: kâğıt zeminini şeffaflaştırma / kenar yumuşatma ---- */
