@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0b1426">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="form-action 'none'">
-<meta name="app-version" content="2026.11.27.03">
+<meta name="app-version" content="2026.11.27.04">
 <script>
 // Kendini güncelleme: kayıtlı (indirilmiş) sürüm bu dosyadakinden yeniyse onu çalıştırır; açılmazsa 9 sn sonra eski sürüme döner.
 (function(){
@@ -391,6 +391,7 @@ html.kbopen .modal{padding-bottom:var(--kbh,260px)}
    <label class="tg"><input type="checkbox" data-p="dailyOnce"> Ayet ve hadis günde yalnız 1 kez gösterilsin</label>
   </div>
   <button type="button" class="btn gray" id="svDailyReset">↻ Ayet/hadisi bugün tekrar göster</button>
+  <div class="note" id="svDailyState"></div>
   <div class="sh2">VERİLERİN EKRANDAKİ YERİ</div>
   <div class="sv-pos" role="group" aria-label="Verilerin konumu">
    <button type="button" data-pos="top">▲ Üstte</button>
@@ -1028,8 +1029,12 @@ function renderSvColors(){
     return '<div class="crow"><span>' + l + '</span><div class="cs">' + colors.map(c => '<span class="csw"><button type="button" style="background:' + c + '" data-col="' + k + '" data-val="' + c + '" aria-label="' + c + '"></button>' + (k === 'bg' && c !== '#000000' ? '<button type="button" class="cx" data-bgdel="' + c + '" aria-label="Arka plan rengini sil">✕</button>' : '') + '</span>').join('') + '<input type="color" data-p="' + k + '" aria-label="' + l + ' seç"></div></div>';
   }).join('');
 }
+function svDailyState(){
+  const el = $('#svDailyState'); if (!el) return;
+  el.textContent = !SVC.dailyOnce ? 'Durum: her açılışta gösterilir.' : dailyShownToday() ? 'Durum: bugün gösterildi — yeni ayet/hadis ertesi gün gelir.' : 'Durum: bugün henüz gösterilmedi.';
+}
 function buildSv(){
-  renderSvColors(); svSync(); renderGal(); svMsg('');
+  renderSvColors(); svSync(); renderGal(); svDailyState(); svMsg('');
 }
 const svChanged = () => { saveSv(); applySaver(); svSync(); svDrawDaily(new Date()); };
 ['input', 'change'].forEach(n => svSet.addEventListener(n, e => {
@@ -1063,7 +1068,7 @@ $('#svClose').onclick = () => { kbClose(); svSet.classList.remove('show'); kbT =
 svSet.addEventListener('click', e => { if (e.target === svSet) { kbClose(); svSet.classList.remove('show'); kbT = search; } });
 $('#svPrev').onclick = () => { kbClose(); svSet.classList.remove('show'); svShow(true); };
 $('#svReset').onclick = () => { const keep = {imgs:SVC.imgs, hiddenBuiltin:SVC.hiddenBuiltin, hiddenBg:SVC.hiddenBg, bgColors:SVC.bgColors}; SVC = Object.assign(deepMerge(SV_DEF, {}), keep); if (SVC.hiddenBuiltin.includes(SVC.g.img)) SVC.g.img = ''; saveSv(); applySaver(); buildSv(); svMsg('Varsayılan ayarlara dönüldü (eklenen resimler korunur, silinenler geri gelmez).'); };
-$('#svDailyReset').onclick = () => { try { localStorage.removeItem(DAILY_KEY); } catch(e){} applyDailyOnce(); svMsg('Ayet ve hadis bugün tekrar gösterilecek.'); };
+$('#svDailyReset').onclick = () => { try { localStorage.removeItem(DAILY_KEY); } catch(e){} applyDailyOnce(); svDailyState(); svMsg('Ayet ve hadis bugün tekrar gösterilecek.'); };
 $('#svKb').onclick = () => { if (kbOn) kbClose(); else { kbT = $('#svUrl'); kbOpen(); } };
 
 /* ---- Resim ekleme: kâğıt zeminini şeffaflaştırma / kenar yumuşatma ---- */
